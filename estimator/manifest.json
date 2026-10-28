@@ -1,0 +1,68 @@
+{
+ "schema": "arc-whitebox-lot estimator manifest v1",
+ "submission_id": 337608,
+ "build_name": "G4",
+ "team": "antoniu_gugu9",
+ "challenge": "ARC White-Box Estimation Challenge 2026, Phase 2 (AIcrowd WhestBench)",
+ "file": "estimator.py",
+ "sha256": "e71018ffa112bc2bc4274798c850fe34170462a88b320522229d8b03c001271f",
+ "bytes": 643721,
+ "lines": 8568,
+ "graded": {
+  "status": "GRADED",
+  "submission_created_utc": "2026-10-21T19:14:15Z",
+  "evaluation_completed_utc": "2026-10-21T20:26:07Z",
+  "score": 2.02360339801228e-09,
+  "score_basis": "mean over the 50 public MLPs of final_layer_mse x max(0.1, FLOPs/B)",
+  "raw_final_layer_mse": 1.5413020655330456e-08,
+  "flops_fraction_public50": 0.131293082730499,
+  "flops_fraction_all100": 0.13084089061896975,
+  "flop_budget": 2199023255552.0,
+  "n_mlps": 100,
+  "mlps_completed": 100,
+  "failed_mlps": 0,
+  "residual_wall_max_s": 0.332431071000002,
+  "predict_wall_max_s": 102.0984028669991,
+  "setup_wall_max_s": 4.237596382999982,
+  "smoke_test_passed": true
+ },
+ "grader_runtime": {
+  "whestbench_version": "0.16.1",
+  "flopscope_version": "0.12.3",
+  "flopscope_server_version": "0.12.3",
+  "numpy_version": "2.2.6",
+  "python_version": "3.10.21",
+  "flopscope_patches": [],
+  "flopscope_client_version": "0.12.3",
+  "participant_shim_version": "0.1.0",
+  "participant_python_version": "3.10.21"
+ },
+ "upload_package": {
+  "note": "manifest.json of the package uploaded for this submission (whest package), reproduced verbatim; its file sha256 equals this file",
+  "package_created_utc": "2026-10-21T19:14:07.066357+00:00",
+  "manifest": {
+   "schema_version": "1.0",
+   "api_version": "2.0",
+   "entrypoint": {
+    "module": "estimator",
+    "class": "Estimator"
+   },
+   "python": {
+    "min_version": "3.10"
+   },
+   "files": [
+    {
+     "name": "estimator.py",
+     "sha256": "e71018ffa112bc2bc4274798c850fe34170462a88b320522229d8b03c001271f"
+    }
+   ],
+   "created_at_utc": "2026-10-21T19:14:07.066357+00:00",
+   "packager_version": "0.1.0",
+   "whestbench_version": "0.16.1",
+   "flopscope_version": "0.12.1",
+   "python_version": "3.10.12",
+   "numpy_version": "2.2.6"
+  }
+ },
+ "provenance_of_numbers": "own grader telemetry for submission 337608 (evaluation JSON, participant antoniu_gugu9); nothing else"
+}

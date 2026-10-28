@@ -1,0 +1,70 @@
+====================================================================================================
+PART A. Single neuron: coincident-index caveat (z ~ N(alpha, 1), h = relu(z))
+----------------------------------------------------------------------------------------------------
+alpha = 0: exact kappa(z,z,h,h) = 0.181690; He2 only 2 c2^2 = 0.318310; c2*c4 cross term = -0.159155; ratio exact/He2 = 0.5708
+   Hermite series truncated at m =   4: 0.212207
+   Hermite series truncated at m =   8: 0.190607
+   Hermite series truncated at m =  20: 0.183717
+   Hermite series truncated at m =  60: 0.182063
+   Hermite series truncated at m = 140: 0.181793
+   Monte Carlo (N = 4e+06): 0.1811
+alpha-dependence (sigma = 1). 'tree' = what LOT's tree level assigns to this coincident configuration:
+the He2 chain 2 c2^2 plus the coincident part of the He3 star, 2 c1 c3 (zero at alpha = 0).
+r(alpha) = (exact - 2c1c3) / (2c2^2) is the factor that would make LOT's He2 same-hub term exact at order a^2 p^2.
+    alpha |   exact  | He2 2c2^2 | tree 2c2^2+2c1c3 | exact - tree | r(alpha)
+    -1.50 | +0.11710 | 0.03355   | +0.05951         | +0.05759     | 2.717
+    -1.00 | +0.22665 | 0.11710   | +0.19388         | +0.03277     | 1.280
+    -0.50 | +0.28741 | 0.24790   | +0.35653         | -0.06912     | 0.721
+     0.00 | +0.18169 | 0.31831   | +0.31831         | -0.13662     | 0.571
+     0.50 | -0.06466 | 0.24790   | +0.00446         | -0.06912     | 0.721
+     1.00 | -0.25729 | 0.11710   | -0.29006         | +0.03277     | 1.280
+     1.50 | -0.27146 | 0.03355   | -0.32905         | +0.05759     | 2.717
+     2.00 | -0.17242 | 0.00583   | -0.20522         | +0.03281     | 6.627
+c_k Stein check at alpha = 0.7 (k = 1..4): max |E[relu He_k] - c_k| = 4.72e-16
+closed form kappa(z,z,h,h)/sigma^4 = 2 Phi(1-Phi) - 2 phi^2 - 2 alpha Phi phi: max |closed - moments| on [-3, 3] = 3.3e-15;  r(alpha) = Phi(1-Phi)/phi^2 - 1 >= pi/2 - 1 = 0.5708
+====================================================================================================
+PART B. Truncated chaos model: width 8, depth 4 (pre-activations z_1..z_4), current layer l = 4; MC N = 1.6e+07 backbone samples
+----------------------------------------------------------------------------------------------------
+backbone sampler: max rel. error of C_b 6.4e-03, of Cov(z_l, z_b) = Gam 5.3e-03 (N = 4e5; MC level)
+MC done in 30.3 s.  Per identity: pooled ratio sum(MC)/sum(theory) +- se, max |z| over the 8 neurons
+   kappa(L,L,Q)    vs Cov(L,psi)        [D3 = 3x]: ratio 0.9996 +- 0.0008; max|z| 0.94
+   kappa(L,L,Q,Q)  vs 2 Var(psi)         [chain = 6x = 12 Var]: ratio 0.9991 +- 0.0017; max|z| 1.30
+   kappa(L,L,L,T*) vs sum c3 P Gam^3     [star = 4x]: ratio 0.9998 +- 0.0018; max|z| 1.19
+   kappa(L,L,L,Ti) vs 3 sum V o Xi       [induced = 4x = 12 V Xi]: ratio 0.9990 +- 0.0023; max|z| 1.93
+   tree-level (i,i,j) slice D21_ij = k(L_i,L_i,Q_j) + 2 Cov(psi_i, L_j): max |MC - theory| / max|theory| = 6.8e-04
+   per neuron (theory / MC): 
+     i=0  Cov -1.9806e-01/-1.9753e-01  2Var 3.8145e-01/3.8098e-01  star +6.4511e-03/+6.2375e-03  3VXi -1.2352e-01/-1.2256e-01
+     i=1  Cov +1.5271e+00/+1.5261e+00  2Var 3.2601e+00/3.2531e+00  star -1.4505e+00/-1.4494e+00  3VXi +1.3062e+00/+1.3030e+00
+     i=2  Cov -8.5374e-01/-8.5294e-01  2Var 1.5138e+00/1.5101e+00  star -7.4535e-01/-7.4482e-01  3VXi +5.4808e-01/+5.4665e-01
+     i=3  Cov -8.9832e-01/-8.9901e-01  2Var 1.8251e+00/1.8282e+00  star -4.5223e-01/-4.5272e-01  3VXi +6.1576e-01/+6.1673e-01
+     i=4  Cov -5.1940e-03/-5.1920e-03  2Var 2.3054e-03/2.3307e-03  star -6.9699e-04/-6.8984e-04  3VXi -1.7145e-04/-1.6148e-04
+     i=5  Cov -7.3003e-02/-7.2972e-02  2Var 7.0897e-02/7.0910e-02  star -2.7528e-02/-2.7536e-02  3VXi +1.3661e-02/+1.3621e-02
+     i=6  Cov +1.7885e-01/+1.7885e-01  2Var 2.9563e-01/2.9565e-01  star -1.0164e-01/-1.0201e-01  3VXi +2.5471e-01/+2.5618e-01
+     i=7  Cov -4.4762e-01/-4.4786e-01  2Var 5.2271e-01/5.2346e-01  star -2.1011e-01/-2.1056e-01  3VXi +1.9513e-01/+1.9537e-01
+exact CGF of z(eps) = L + eps Q: kappa3 = eps 6 a'Ma + eps^3 8 tr M^3, kappa4 = eps^2 48 a'M^2a + eps^4 48 tr M^4
+   max rel |6 a'Ma - D3| = 7.8e-15;  max rel |48 a'M^2a - 12 Var(psi)| = 8.4e-15
+   loops at width 8 (not part of LOT): mean |8 tr M^3| / mean |D3| = 0.71; mean 48 tr M^4 / mean chain = 0.70
+Cauchy-Schwarz: min_i [12 Var(psi) - (4/3) D3^2/var] / (12 Var(psi)) = 0.3507 (>= 0); rho_i in [-0.795, 0.806]; (4/3)D3^2/(var rho^2) = 12 Var(psi): max rel err 3.9e-16
+   rank-one case z = u + e(u^2-1), e = 0.1: D3 = 6e = 0.600, chain = 48 e^2 = 0.4800, (4/3) D3^2/var = 0.4800 (equality)
+self vs cross-source chains at l = 4: mean self/total = 0.578, corr(self, total) = 0.985
+3+2 tree born at b (b = 2..3), transported to layer 4: max rel |T32 - (12 V o Xi + 24 sum_b'<b V G V')| = 2.8e-15
+   => LOT (chain + star + induced) = sum over birth layers of ARC's path (x12) + star (x4) + 3+2 (x12) trees
+code mirror of _lot_g4 (K = 3): max rel |T3 - Gam| = 1.1e-16; |KU(J2) - KU| = 4.5e-17
+   12 cand vs 12 Var(Pi_K psi) + 12 sum V^2 var + 4 sum c3 P Gam^3: max rel err 6.9e-16; basis invariance (Q -> QR) 8.0e-16
+   S-form: max rel |W_i^T B_q W_i - KU_iq| = 2.7e-16; 3 q'Lam q with Lam = 4 (Q^T C Q)^-1 vs 12 Var(Pi_K psi): 3.0e-15; Lam PSD: min eig 5.96e-01
+   mean (Var(Pi_K psi) + same) / mean Var(psi) with exact top-K modes: K=1: 0.993, K=2: 1.196, K=4: 1.221, K=8: 1.276  (not a decomposition: 'same' double counts what the projection already holds)
+====================================================================================================
+PART C. Accuracy probe vs the TRUE network (MC from x): width 32, depth 6, 4 networks, N = 3.0e+06 per network
+----------------------------------------------------------------------------------------------------
+MC done in 26.4 s.  Entries: mean over networks of corr / slope (slope = true regressed on prediction)
+    layer | D3 (LOT) vs true kappa3 |     chain+star+induced |             chain+star |       self-chains+star |         (4/3) D3^2/var | same-hub x r(alpha), +s+i
+        3 |   +0.972 / +1.19       |   +0.925 / +0.70       |   +0.912 / +0.77       |   +0.794 / +0.82       |   +0.653 / +1.20       |   +0.953 / +1.00      
+        4 |   +0.971 / +1.22       |   +0.927 / +0.75       |   +0.925 / +0.91       |   +0.802 / +1.23       |   +0.809 / +1.46       |   +0.934 / +0.92      
+        5 |   +0.961 / +1.29       |   +0.923 / +0.82       |   +0.902 / +0.94       |   +0.623 / +1.47       |   +0.871 / +1.83       |   +0.902 / +0.94      
+        6 |   +0.970 / +1.23       |   +0.946 / +0.94       |   +0.933 / +1.14       |   +0.384 / +0.92       |   +0.883 / +1.42       |   +0.950 / +1.05      
+    layer 3: true kappa4 mean 0.595 (MC se per neuron ~3.7e-03); same-hub share of the chain 0.93; Gaussian-closure var / MC var 0.981
+    layer 4: true kappa4 mean 0.779 (MC se per neuron ~3.1e-03); same-hub share of the chain 0.76; Gaussian-closure var / MC var 0.964
+    layer 5: true kappa4 mean 0.726 (MC se per neuron ~2.4e-03); same-hub share of the chain 0.78; Gaussian-closure var / MC var 1.006
+    layer 6: true kappa4 mean 0.784 (MC se per neuron ~2.6e-03); same-hub share of the chain 0.62; Gaussian-closure var / MC var 0.967
+====================================================================================================
+total wall time 57.1 s (seed 20261025)

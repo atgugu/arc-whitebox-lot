@@ -1,0 +1,27 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.venv*/
+venv/
+.ipynb_checkpoints/
+
+# Local secrets and editor/OS files (never commit credentials)
+.env
+*.key
+*.pem
+.DS_Store
+*.swp
+
+# Data, weights and run artefacts are deliberately not part of the code release
+# (training/README.md says what they are, how large, and how to regenerate them).
+# Scoped to the code directories so that figures/ and paper/ can keep their own data files.
+/training/**/*.npz
+/training/**/*.npy
+/training/**/*.pt
+/training/**/*.jsonl
+/training/**/dumps*/
+/training/**/out/
+/controls/out/
+/estimator/**/*.npz
+/estimator/**/*.npy
+/verify_out/

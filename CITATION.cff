@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below."
+title: "Shape from theory, level from data"
+abstract: >-
+  Estimator and code release of Antoniu Gugu (AIcrowd antoniu_gugu9) for the ARC White-Box Estimation Challenge 2026, Phase 2
+  (AIcrowd WhestBench): per-neuron means of random 1024x16 He-initialised ReLU MLPs within a FLOP budget of 2^41.
+  The released estimator is byte-identical to graded submission #337608.
+type: software
+authors:
+  - family-names: "Gugu"
+    given-names: "Antoniu"
+date-released: "2026-10-28"
+version: "337608"
+license: MIT
+repository-code: "https://github.com/atgugu/arc-whitebox-lot"
+url: "https://github.com/atgugu/arc-whitebox-lot"
+keywords:
+  - cumulant propagation
+  - mechanistic estimation
+  - ReLU networks
+  - ARC White-Box Estimation Challenge

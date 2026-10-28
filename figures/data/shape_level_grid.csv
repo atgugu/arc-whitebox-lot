@@ -1,0 +1,12 @@
+terms,level,variant,nets,ratio_vs_v29,ci_lo,ci_hi,nets_better,source
+exact chain + star,V29 level (shape only),v29+f32|lot:shape:chainstar,0-5,0.7931,0.7621,0.8241,6/6,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+exact chain + star,own level (fit-free),v29+f32|lot:rep:chainstar,0-5,0.8294,0.7897,0.8691,6/6,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+exact chain + star,own level (fit-free),v29+f32|lot:rep:chainstar,0-11,0.7901,0.7517,0.8285,12/12,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+projected K=32 + same + star,V29 level (shape only),v29+f32|lot:shape:proj32:1:1:0:chain,0-5,0.8410,0.8176,0.8643,6/6,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+projected K=32 + same + star,V29 level (shape only),v29+f32|lot:shape:proj32:1:1:0:chain,0-11,0.8217,0.7950,0.8485,12/12,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+projected K=32 + same + star,own level (fit-free),v29+f32|lot:rep:proj32:1:1:0:chain,0-5,1.4929,1.4160,1.5698,0/6,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+projected K=32 + same + star,own level (fit-free),v29+f32|lot:rep:proj32:1:1:0:chain,0-11,1.3812,1.2749,1.4876,0/12,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+exact chain + star + induced,V29 level (shape only),v29+f32|lot:shape:he2,0-5,0.7847,0.7332,0.8362,6/6,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+exact chain + star + induced,V29 level (shape only),v29+f32|lot:shape:he2,0-11,0.7504,0.7056,0.7952,12/12,"checks/data/lot_runs/inchain*.jsonl (final_mse per network), paired sum-ratio vs v29+f32"
+exact chain + star,V29 level / own level (direct),v29+f32|lot:shape:chainstar / v29+f32|lot:rep:chainstar,0-5,0.9563,0.9236,0.9890,5/6,same files; paired
+projected K=32,V29 level / own level (direct),v29+f32|lot:shape:proj32:1:1:0:chain / v29+f32|lot:rep:proj32:1:1:0:chain,0-11,0.5949,0.5565,0.6334,12/12,same files; paired

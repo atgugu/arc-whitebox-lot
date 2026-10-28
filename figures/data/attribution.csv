@@ -1,0 +1,46 @@
+step,from_id,to_id,ratio_score,ratio_raw,ratio_flops,bucket,single_change(y/n),description,source
+V29->s01,V29,335600,0.62565,0.87902,0.71434,"bundle: new (Codex-era AS32/L5 + (3,1) + D21/joins) + engineering (product reuse)",n,"product_reuse_v3 = Codex-era stack; first graded build; file 212,803 bytes, not V29 (93,422 bytes)","project history (board 5.40e-9; raw 2.13e-8; C/B 0.2526; board scale, not this work's telemetry); grader JSON #335600; s01"
+s01->s04,335600,335736,0.96177,1.03754,0.92715,engineering-FLOP (knob retune of new code),n,AS_CDEAD 2.5 + TD_R_FB 4 + AS_YMIN 12,grader JSON #335600; grader JSON #335736; s04
+s04->s08,335736,335749,0.96907,0.88377,1.09648,new learned correction (HZ) + engineering (Winograd-2),n,HZ with 192 in-chain rows + Winograd-2; raw x0.884 but FLOPs x1.096 (see DIFF E-06),grader JSON #335736; grader JSON #335749; s08
+s08->s10,335749,335775,0.97273,0.99701,0.97565,engineering-FLOP (HZ finish),y,deferred Horner HZ (HZD),grader JSON #335749; grader JSON #335775; s10
+s10->s11,335775,335780,0.99398,1.00846,0.98564,new learned correction (HZ structure),n,per-layer HZ rows + 7 riders,grader JSON #335775; grader JSON #335780; s11
+s11->s12,335780,335791,0.99950,0.99951,1.00001,new learned correction (refit),y,theta refit on 48 dumps,grader JSON #335780; grader JSON #335791; s12
+s12->s13,335791,335819,0.97117,1.00026,0.97093,engineering-FLOP,n,"exact FLOP cuts (frozen-join, srcP sketch, D21 lift regrouping, LOT old-source reorder)",grader JSON #335791; grader JSON #335819; s13
+s13->s14,335819,335892,0.98898,0.99986,0.98897,engineering-FLOP,n,cost1 + padded deeper recursion + pruned pool spec,grader JSON #335819; grader JSON #335892; s14
+s14->s15,335892,335909,0.96648,1.01070,0.95624,engineering-FLOP (approximation: soft-dead tail),y,"soft-dead tail: FLOPs x0.9534, raw x1.0129",grader JSON #335892; grader JSON #335909; s15
+s15->s16,335909,335958,0.98063,0.99001,0.99050,new mechanistic (per-source hub windows) + engineering,n,"YR_T/YR_D hub windows, D21_GRAN 64, OLD_ROWW",grader JSON #335909; grader JSON #335958; s16
+s16->s17,335958,336007,0.99196,0.99335,0.99861,ported (H18: Yinita/Niko) + new (LOTW) + refit,n,LOTW + H18 + refit theta,grader JSON #335958; grader JSON #336007; s17
+s17->s18,336007,336022,0.97739,0.99747,0.97988,ported (K31TWO: kai_leal_gonzalez) + engineering (ZF7) + refit,n,ZF7 in-place Strassen core + K31TWO=2 + refit,grader JSON #336007; grader JSON #336022; s18
+s18->s19,336022,336060,0.99327,-,-,engineering,y,+ QRS pseudo-inverse + DSF=2 (NO telemetry file; docs score),grader JSON #336022; project history table (no telemetry file); s19
+s19->s20,336060,336086,0.98441,-,-,new learned correction (HZ riders),y,HX5 riders (NO telemetry file; docs score),project history table (no telemetry file); project history table (no telemetry file); s20
+s20->s21,336086,336116,0.99817,-,-,new learned correction (HZ pair-matrix riders),y,HX6 riders (NO telemetry file; docs score),project history table (no telemetry file); project history table (no telemetry file); s21
+s21->s22,336116,336141,0.98034,-,-,engineering-FLOP (cost bundle B),n,"V28_STRASSEN_SB 6, TA_OLD_MIN 6, D21_LIFT_FMM_M 0, C7_S",project history table (no telemetry file); grader JSON #336141; s22
+s22->s23,336141,336155,0.97512,0.99291,0.98206,ported (LordProcciuto FIJA2 port) + refit,n,FIJA2 R_OLD 448 + refit,grader JSON #336141; grader JSON #336155; s23
+s23->s24,336155,336171,0.97498,0.96683,1.00849,engineering-FLOP + new knob,n,R_OLD2 256 + AGE_OLD2 8 + FX exact trims + refit,grader JSON #336155; grader JSON #336171; s24
+s24->s25,336171,336242,0.97494,0.98565,0.98919,new mechanistic (D21 demand rows) + ported (OLD_HOT1) + LOT K=16,n,"D21_CUT 2.25, AS_CDEAD 3.0, D21_RANK 8, PORTLOT_K 16, OLD_HOT1 + refit",grader JSON #336171; grader JSON #336242; s25
+s25->s26,336242,336286,0.98328,1.01889,0.96504,engineering-FLOP + new LOT K=12 (first K=12 build),n,st3 knobs + PORTLOT_K 12 + ZF7_AB + VIEW_LIMIT + refit,grader JSON #336242; grader JSON #336286; s26
+s26->s28g,336286,336430,0.98077,1.00210,0.97867,engineering (robustness guard),n,guard_patch (post-s26 knobs OFF off-suite); s27/s28 smoke failures not on chain,grader JSON #336286; grader JSON #336430; s28g
+s28g->s31,336430,336456,0.98563,0.99995,0.98566,"engineering (engine3, exact cuts, QRV)",n,"engine3 LX_PAD, NLK_PK/K22, QRB/QRV, AU_* cuts, hzgate, HZW",grader JSON #336430; grader JSON #336456; s31
+s31->s32,336456,336472,0.99633,1.00043,0.99590,engineering (HZ Strassen level),n,HZ_L6 + HZG_L6,grader JSON #336456; grader JSON #336472; s32
+s32->s33a,336472,336493,0.99631,0.99869,0.99761,engineering-FLOP (exact knobs),n,"J2_* (5 exact knobs), AU_T1PK_EXT, AU_REUSE",grader JSON #336472; grader JSON #336493; s33a
+s33a->s33b,336493,336512,0.99855,1.00146,0.99711,engineering-FLOP (exact knobs),n,"J3_TRI, AU_SYM4",grader JSON #336493; grader JSON #336512; s33b
+s33b->s34,336512,336557,0.99396,1.00427,0.98975,new mechanistic (D21 rank) + ported (FIJA2) + learned (theta),n,"D21_RANK 8->2, FIJA2_PASS 4, theta_BEST1, robustness",grader JSON #336512; grader JSON #336557; s34
+s34->s35,336557,336563,0.99829,0.99992,0.99835,ported (FIJA2) + learned (theta),n,FIJA2_PASS 1 + theta_BEST2FP1,grader JSON #336557; grader JSON #336563; s35
+s35->s36,336563,336574,0.99847,1.00061,0.99788,new learned correction / tuning,n,AS_FINAL_MAX 256->384 + refit theta,grader JSON #336563; grader JSON #336574; s36
+s36->s37,336574,336614,0.99269,0.99896,0.99364,new mechanistic (CDP band) + new orientation fix + learned,n,CDP_C 1.75 + EF_K31T21 + theta,grader JSON #336574; grader JSON #336614; s37
+s37->s38,336614,336712,0.99304,1.00003,0.99308,new mechanistic (FIN_EDGE final-layer Edgeworth) + engineering,n,FIN_EDGE + thin engine/DN_FSUB + TDP_JOIN 1.75 + OPD call diet,grader JSON #336614; grader JSON #336712; s38
+s38->s39,336712,336724,0.99453,1.00271,0.99187,new tuning (band constants),n,CDP_C 1.625 + CDP_R 1 + TDP_C 1.25 + MIT header,grader JSON #336712; grader JSON #336724; s39
+s39->s40,336724,336728,0.99104,0.99110,1.00000,new mechanistic (MID_EDGE),y,"+ MID_EDGE (Edgeworth means, rows dropped at L6-14)",grader JSON #336724; grader JSON #336728; s40
+s40->s42,336728,336749,0.99226,0.99219,1.00006,re-derived from others (Kuznetsov rule) + new tail placement,y,"+ MARG2 (C=2.0), from s40 (s41 theta-only side branch excluded: x1.0007)",grader JSON #336728; grader JSON #336749; s42
+s42->s42r,336749,336773,1.00122,1.00125,0.99998,engineering (bit-identical call diet),n,LOTD + RRES; predictions identical on 8 nets; graded ratio = grader noise (x1.0012),grader JSON #336749; grader JSON #336773; s42r
+s42r->s43,336773,336780,0.99891,0.99897,0.99995,new mechanistic (pair closure),n,"MARG1 0, D2SQ_S 0.5, CK22_S 1.0 (D^2 halving; graded twin x0.9989 not significant)",grader JSON #336773; grader JSON #336780; s43
+s43->s43f,336780,336999,0.99676,1.00339,0.99339,UNVERIFIABLE content (project journal gives score only),n,track-A s43f; x0.99676 vs s43; WG never fired,grader JSON #336780; grader JSON #336999; project journal
+s43f->a1,336999,337081,0.99465,0.98096,1.01396,new (fblate B8 R16; description per project journal),y,A' = s43f + fblate B8 R16,grader JSON #336999; grader JSON #337081; project journal
+a1->b1,337081,337082,0.99616,1.00064,0.99554,"engineering-FLOP (PEEL, COST-X) + guards",n,B1 = A' + PEEL + B_agg3 guards,grader JSON #337081; grader JSON #337082; project journal
+b1->S1,337082,337159,0.99032,0.99902,0.99122,engineering/new (B9 + PEEL; comparator B1 per project journal),n,S' = sp1 (project journal 'S' = B9 + PEEL'),grader JSON #337082; grader JSON #337159; project journal
+S1->S2,337159,337231,0.99663,1.00393,0.99263,UNVERIFIABLE content (project journal gives gates only),n,S'' graded; RULING 14 all gates PASS,grader JSON #337159; grader JSON #337231; project journal
+S2->nl1,337231,337317,0.97831,0.97746,1.00088,"new learned correction (NLHZ head)",y,"NLHZ head (f4bdnl1_f); screen x0.97874 (n=100), confirm x0.97611 (n=150)","grader JSON #337231; grader JSON #337317; project journal"
+nl1->nl2,337317,337322,0.99633,1.00005,0.99632,new learned correction (TERMITE v2 features),y,"NLHZ + TERMITE v2 (f4tmnl_f); 99/100, MLP 83 TIME_EXHAUSTED (hidden, not public-50)",grader JSON #337317; grader JSON #337322; project journal
+nl2->G3,337322,337411,0.99687,0.99661,1.00025,"new learned correction (head nl3, f4b2v5_f)",n,G3 = nl3 (f4b2v5_f); head details UNVERIFIABLE here,grader JSON #337322; grader JSON #337411; project journal
+G3->G4,337411,337608,0.99663,0.99671,0.99995,new learned correction (head fine-tune on final-layer MSE),y,G3 ship file with only the _NLHZ_P line swapped to arm c (one-line weights diff),grader JSON #337411; grader JSON #337608; project journal
+G4->G5,337608,337632,0.99970,0.99975,0.99995,"new learned correction (head d640 + extra data), failed this work's wall-time margin",y,G4 file with only _NLHZ_P swapped to d640 (CV x0.99952 z -1.96 below gate); wall max 107.9 s > 106,grader JSON #337608; grader JSON #337632; project journal

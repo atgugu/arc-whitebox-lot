@@ -1,0 +1,195 @@
+"""mk_nlhz_patch5.py (from mk_nlhz_patch4.py, 20 Oct 2026; own code; lean v5 = v2 + whole GROUPS of the v4 pair reductions;
+usage: python mk_nlhz_patch5.py <head.npz> <out_patch.py> <xfcols, whole groups C=0,1,2,3 M=4,5 D=11,12 P=13,14 in that order>)
+(original docstring follows) mk_nlhz_patch.py (20 Oct 2026; own code): writes a self-contained CONTRACT-format patch nlhz_patch.py from a nl_train.py head.
+usage: python mk_nlhz_patch.py <prefix_head.npz> <out_patch.py>
+The generated patch adds the NLHZ non-linear HZ rider head (one shared MLP over the rider slabs of layers 2..15, inputs in the SHIP order
+of nl_train.feats: 17 rider columns (the kf constants are folded into the standardization) + 13 slab-derived features).
+"""
+import sys
+import numpy as np
+
+S2P = 0.3989422804014327
+KF = (-S2P / 6.0, -S2P / 6.0, S2P / 2.0, S2P / 2.0, S2P / 24.0, S2P / 24.0, S2P / 24.0, S2P / 2.0, S2P / 2.0, S2P / 2.0, S2P / 24.0,
+      S2P / 24.0, S2P / 24.0, S2P / 24.0, S2P / 24.0, S2P / 24.0, -S2P / 6.0)
+
+h = np.load(sys.argv[1])
+F, NL, dep = int(h['F']), int(h['NL']), int(h['dep'])
+ST = int(h['st'])
+XF = int(h['xf']) if 'xf' in h.files else 0
+XFC = [int(c) for c in sys.argv[3].split(',')]
+NX = len(XFC)
+GROUPS = {'C': [0, 1, 2, 3], 'M': [4, 5], 'D': [11, 12], 'P': [13, 14]}
+GS = [g for g, cs in GROUPS.items() if cs[0] in XFC]
+assert XF == 1 and XFC == sum((GROUPS[g] for g in GS), []), 'v5: xfcols must be whole groups in C, M, D, P order'
+body, parts, scal, need = '', [], [], ''
+if 'C' in GS:
+    need += ' or C is None or D3 is None'
+    body += "    iv = isg * isg\n    CV = fnp.matmul(C, fnp.stack([w1, w2, D3 * iv], axis=1))\n    c2 = fnp.sum(C * C, axis=1)\n"
+    parts += ['c2[:, None]', 'CV']; scal += ['iv * iv', 'isg', 'isg', 'isg']
+if 'M' in GS:
+    need += ' or M is None'
+    body += "    MV = fnp.matmul(M, fnp.stack([w1 * 0.0 + 1.0, w1], axis=1))\n" + ("" if 'C' in GS else "    iv = isg * isg\n")
+    parts += ['MV']; scal += ['iv * iv', 'isg']
+if 'D' in GS:
+    need += ' or D is None'
+    body += "    DW = fnp.stack([fnp.matmul(D, w2), fnp.matmul(w1, D)], axis=1)\n"
+    parts += ['DW']; scal += ['isg', 'isg']
+if 'P' in GS:
+    need += ' or C is None'
+    body += "    C2 = C * C\n    PW = fnp.stack([fnp.matmul(C2, w2), fnp.matmul(C2 * C, w3) * isg], axis=1)\n" + ("" if ('C' in GS or 'M' in GS) else "    iv = isg * isg\n")
+    parts += ['PW']; scal += ['iv', 'iv']
+if len(parts) == 1 and all(x == 'isg' for x in scal):
+    body += "    X = %s * isg[:, None]\n" % parts[0]
+else:
+    body += "    X = fnp.concatenate([%s], axis=1) * fnp.stack([%s], axis=1)\n" % (', '.join(parts), ', '.join(scal))
+NLX_SRC = ("def _nlhz_x(T, li, nr, C, M, D, w1, w2, w3, D3, var):\n"
+           "    # nlhz_patch v5 (lean v4): only the trained groups (" + ','.join(GS) + ") of the per-row pair reductions of layer li\n"
+           "    # (alive order, as the h6 riders), normalized per row exactly as in training\n"
+           "    if 'NLX' not in T" + need + ":\n        return\n    isg = 1.0 / fnp.sqrt(var)\n" + body +
+           "    fnp.copyto(T['NLX'][li, :nr], X)\n\n\n")
+assert NL == 14 and dep in (2, 3) and ST == 1 and list(h['stcols']) == [0, 2, 3, 5, 1] and F == 35 + NX, 'unsupported head'
+med, sd, rs = h['med'], h['sd'], h['rs']            # (14, 30), (14, 30), (14,)
+# fold kf into the standardization of the 17 rider columns: (kf x - med) / sd = (x - med / kf) / (sd / kf)
+kf = np.r_[np.array(KF), np.ones(F - 17)]
+M = med / kf[None, :]
+IS = kf[None, :] / sd                                # multiply form; sign of kf folds in exactly
+const = sd <= 1e-20 * np.maximum(1.0, np.abs(med))    # zero training spread (e.g. layer-2 state, all-zero h6 columns): input forced to 0
+IS = np.where(const, 0.0, IS); M = np.where(const, 0.0, M)
+print('constant (layer, feature) inputs zeroed:', int(const.sum()))
+assert np.abs(IS).max() < 1e12 and np.abs(M).max() < 1e12, 'oversized standardization constant'
+W0, b0 = h['W0'], h['b0']
+WH = [h['W%d' % j] for j in range(1, dep)]; BH = [h['b%d' % j] for j in range(1, dep)]
+WL, bL = h['W%d' % dep], h['b%d' % dep]
+W0x = W0[:, :F].T                                    # (30, H)
+B0 = (b0[None, :] + W0[:, F:].T)                     # (14, H): layer one-hot folded into a per-layer bias
+P = dict(M=M.tolist(), IS=IS.tolist(), W0=W0x.tolist(), B0=B0.tolist(), WH=[w.T.tolist() for w in WH], bH=[b.tolist() for b in BH],
+         W2=WL.T.tolist(), rs=rs.tolist(), c2=(float(bL[0]) * rs).tolist(), st=[float(ST)], xf=[float(NX)])
+def _fmt(v):
+    # float32-exact compact literal (9 significant digits round-trip a float32)
+    if isinstance(v, list):
+        return '[' + ', '.join(_fmt(x) for x in v) + ']'
+    return '%.9g' % float(np.float32(v))
+lit = '{' + ', '.join(repr(k) + ': ' + _fmt(v) for k, v in P.items()) + '}' 
+assert 'nan' not in lit and 'inf' not in lit
+
+PATCH = r'''"""nlhz_patch.py <in.py> <out.py> (20 Oct 2026; own code, generated by mk_nlhz_patch.py from %(src)s).
+NLHZ = non-linear HZ rider head.  In Estimator._hz_finish, after the linear riders have written H['sl_out'] (rows = layers, alive order),
+add  rs_l * MLP_l(x)  on the rider slabs of layers 2..15, x = 30 per-row features built from the same slabs the linear riders read
+(17 rider multipliers + alpha, log var and 11 slab / var-power ratios), robust-standardized per layer and clipped to +-8; MLP = 30 -> H ->
+H -> 1 ReLU net with a per-layer first bias.  Trained offline (nl_train.py) on the born mean error of the S'' production chain (HZ dumps,
+public nets 0-136, 337-399, 500-699), on the residual of the per-layer linear refit of the 24 HZ columns that is baked as HZ_TH.
+The corrections ride the existing transport to the final layer (Phi W), exactly like the linear riders.  Idea family credited to the
+carried learned correctors described by CLG / Susupro / hyojun (re-derived; no code read).
+Knob (module level): NLHZ '1' = on (default '0' = parent op stream: a Python bool test in setup and in _hz_finish, no flopscope call).
+Gated on the scored suite (n == 1024, L == 16; tables built in _hz_setup only then) and on the rider path (rid).  GUARD_EXTRA name: NLHZ.
+Cost: ~0.17 GF (0.06%% of the bill) and ~55 flopscope calls per predict.
+"""
+import sys
+
+src = open(sys.argv[1]).read()
+n_ed = 0
+
+
+def sub(old, new, tag):
+    global src, n_ed
+    c = src.count(old)
+    assert c == 1, (tag, c)
+    src = src.replace(old, new, 1)
+    n_ed += 1
+
+
+K1 = r"""HZ_DEBUG = None
+NLHZ = _os.environ.get('NLHZ', '0') == '1'   # nlhz_patch: non-linear HZ rider head (MLP on the rider slabs, layers 2..15)
+_NLHZ_P = %(lit)s
+
+
+def _nlhz_build(f32):
+    # nlhz_patch: head tables as float32 arrays (setup; data independent)
+    P = _NLHZ_P
+    t = lambda k: fnp.asarray(P[k], dtype=f32)
+    nl = len(P['rs'])
+    return dict(M=fnp.reshape(t('M'), (nl, 1, -1)), IS=fnp.reshape(t('IS'), (nl, 1, -1)), W0=t('W0'),
+                B0=fnp.reshape(t('B0'), (nl, 1, -1)), WH=[fnp.asarray(w, dtype=f32) for w in P['WH']],
+                bH=[fnp.asarray(b, dtype=f32) for b in P['bH']], W2=t('W2'),
+                rs=fnp.reshape(t('rs'), (nl, 1, 1)), c2=fnp.reshape(t('c2'), (nl, 1, 1)),
+                **({'STB': fnp.zeros((nl, 1024, 5), dtype=f32)} if P['st'][0] else {}),
+                **({'NLX': fnp.zeros((16, 1024, int(P['xf'][0])), dtype=f32)} if P['xf'][0] else {}))
+
+
+%(nlx)sdef _nlhz_apply(H, hz_W):
+    # nlhz_patch: sl_out[2:] += rs * MLP(x) on the rider slabs of layers 2..15 (padded entries stay finite and are never read)
+    T = H['nl']
+    g = lambda k: H['sl_' + k][2:]
+    vs = g('var')
+    sgs = fnp.sqrt(vs)
+    als = g('mu') / sgs
+    a2s = als * als
+    ps = fnp.exp(a2s * -0.5)
+    vsg = vs * sgs
+    v2 = vs * vs
+    pq = (a2s - 1.0) * ps / vsg
+    aps = als * ps
+    D3 = g('D3')
+    same = g('same')
+    c0 = aps / vs * D3
+    c2_ = ps * sgs
+    c4_ = pq * g('port')
+    psv = ps / vsg
+    cols = [c0, c0 * a2s, c2_, c2_ * a2s, c4_, c4_ * a2s, pq * g('g4'), psv * same, psv * g('proj'), psv * g('star'),
+            pq * D3 * D3 / vs, pq * same, pq * g('h6_d21_w1'), pq * g('h6_d21_e'), pq * g('h6_d21_s'), pq * g('h6_d21_d3'),
+            aps / vsg * g('h6_k31b_s'),
+            als, fnp.log(vs), D3 / vsg, g('g4') / v2, g('port') / v2, same / v2, g('proj') / v2, g('star') / v2,
+            g('h6_d21_d3') / vsg, g('h6_d21_e') / vsg, g('h6_d21_s') / vsg, g('h6_d21_w1') / vsg, g('h6_k31b_s') / v2]
+    X = fnp.stack(cols, axis=-1)
+    if 'STB' in T:
+        # carried state of layer li (rows k = li - 2 >= 1): layer li-1 slab quantities pushed through hz_W[li] o hz_W[li] (4) and
+        # hz_W[li] (1), in the alive orders of the two layers (hz_W[li] = alive(li) x alive(li-1), as in the final transport below)
+        STB = T['STB']
+        vp = H['sl_var'][1:15]
+        sgp = fnp.sqrt(vp)
+        ap_ = H['sl_mu'][1:15] / sgp
+        pp = fnp.exp(ap_ * ap_ * -0.5) * 0.3989422804014327
+        c2p = pp / sgp
+        q5 = c2p * H['sl_D3'][1:15] / vp
+        Q = fnp.stack([c2p * vp, c2p * c2p * vp * vp, pp * ap_ * H['sl_g4'][1:15] / (vp * vp), q5], axis=-1)
+        for k in range(1, 14):
+            Wl = hz_W[k + 2]
+            nr_, ni_ = int(Wl.shape[0]), int(Wl.shape[1])
+            S4 = fnp.matmul(Wl * Wl, Q[k, :ni_])
+            S1 = fnp.matmul(Wl, q5[k, :ni_])
+            fnp.copyto(STB[k, :nr_], fnp.concatenate([S4, S1[:, None]], axis=1))
+        X = fnp.concatenate([X, STB], axis=-1)
+    if 'NLX' in T:
+        X = fnp.concatenate([X, T['NLX'][2:]], axis=-1)
+    X = fnp.clip((X - T['M']) * T['IS'], -8.0, 8.0)
+    h1 = fnp.maximum(fnp.matmul(X, T['W0']) + T['B0'], 0.0)
+    for Wh_, bh_ in zip(T['WH'], T['bH']):
+        h1 = fnp.maximum(fnp.matmul(h1, Wh_) + bh_, 0.0)
+    o = fnp.matmul(h1, T['W2']) * T['rs'] + T['c2']
+    so = H['sl_out'][2:]
+    fnp.add(so, o[:, :, 0], out=so)
+    if 'NLX' in T:
+        fnp.copyto(T['NLX'], 0.0)   # v4: next predict starts from zeros (layers without the h6 pair matrices stay 0, as in training)
+"""
+sub("HZ_DEBUG = None\n", K1, 'knobs')
+
+a2 = "        H['rid_any'] = bool(HZ_RIDERS and any(rc(li, f) != 0.0 for li in range(L) for f in range(17)))\n"
+sub(a2, a2 + "        if NLHZ and n == 1024 and L == 16:\n            H['nl'] = _nlhz_build(f32)   # nlhz_patch\n", 'setup')
+
+a5 = "                            fnp.subtract(fnp.matmul(_dv, _D), fnp.diag(_D) * _dv, out=self._hz_slab('h6_k31b_s', li, nr))\n"
+sub(a5, a5 + "                            if NLHZ and 'nl' in self._hz and self._nfull == 1024:\n                                _nlhz_x(self._hz['nl'], li, nr, _C, _M, _D, _w1, _w2, _w3, D3, var)   # nlhz_patch v5\n", 'x-site')
+a3 = "        if HZ_DEBUG is not None:\n"
+sub(a3, "        if NLHZ and rid and 'nl' in H:\n            _nlhz_apply(H, hz_W)   # nlhz_patch\n" + a3, 'apply')
+
+a4 = "'HZG_EXT', 'HZG_L6')   # guard_patch: switched off for off-suite predicts\n"
+c4 = src.count(a4)
+assert c4 in (0, 1), ('guard', c4)
+if c4 == 1:
+    src = src.replace(a4, "'HZG_EXT', 'HZG_L6', 'NLHZ')   # guard_patch: switched off for off-suite predicts\n", 1)
+    n_ed += 1
+open(sys.argv[2], 'w').write(src)
+print('nlhz_patch: %%d edits' %% n_ed)
+'''
+out = PATCH % dict(src=sys.argv[1].split('/')[-1], lit=lit, nlx=NLX_SRC)
+open(sys.argv[2], 'w').write(out)
+print('wrote', sys.argv[2], 'literal floats', sum(np.size(np.array(v, dtype=object)) if k not in ('WH', 'bH') else sum(np.size(x) for x in v) for k, v in P.items()))

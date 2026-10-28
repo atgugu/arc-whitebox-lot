@@ -1,0 +1,9 @@
+control_id,control,base_id,metric,n,sum_ratio,se,z,mlps_worse,source
+336912,LOT off (PORTLOT=0),336780,final_layer_mse,50,1.35747,0.01208,25.31,50,"checks/data/graded_public_mlps.csv (public_scores of grader JSON #336780, grader JSON #336912); recomputed by checks/recompute.py"
+336912,LOT off (PORTLOT=0),336780,adjusted_final_layer_score,50,1.48354,0.01250,31.54,50,"checks/data/graded_public_mlps.csv (public_scores of grader JSON #336780, grader JSON #336912); recomputed by checks/recompute.py"
+336911,HZ off (HZ_ON=0),336780,final_layer_mse,50,1.22826,0.00888,23.14,50,"checks/data/graded_public_mlps.csv (public_scores of grader JSON #336780, grader JSON #336911); recomputed by checks/recompute.py"
+336911,HZ off (HZ_ON=0),336780,adjusted_final_layer_score,50,1.15447,0.00885,16.22,50,"checks/data/graded_public_mlps.csv (public_scores of grader JSON #336780, grader JSON #336911); recomputed by checks/recompute.py"
+336913,all D21 rows exact (D21_CUT=99),336780,final_layer_mse,50,0.99694,0.00397,-0.77,22,"checks/data/graded_public_mlps.csv (public_scores of grader JSON #336780, grader JSON #336913); recomputed by checks/recompute.py"
+336913,all D21 rows exact (D21_CUT=99),336780,adjusted_final_layer_score,50,1.08026,0.00406,19.03,49,"checks/data/graded_public_mlps.csv (public_scores of grader JSON #336780, grader JSON #336913); recomputed by checks/recompute.py"
+336912,LOT+HZ off vs HZ off (LOT's increment without HZ),336911,final_layer_mse,50,1.10520,0.00881,11.35,47,"checks/data/graded_public_mlps.csv (public_scores of grader JSON #336911, grader JSON #336912); recomputed by checks/recompute.py"
+336912,LOT+HZ off vs HZ off (LOT's increment without HZ),336911,adjusted_final_layer_score,50,1.28504,0.00934,26.86,50,"checks/data/graded_public_mlps.csv (public_scores of grader JSON #336911, grader JSON #336912); recomputed by checks/recompute.py"

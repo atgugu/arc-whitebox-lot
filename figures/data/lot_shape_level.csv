@@ -1,0 +1,11 @@
+order,role,group,label,level,nets,ratio,ci_lo,ci_hi,nets_better,cost,variant,source
+0,group,exact,Exact chain + star,,0-5,,,,,est. ~210 u,,cost: theory notes (shape:chainstar)
+1,bar,exact,V29 level × LOT shape,V29 level,0-5,0.7931,0.7621,0.8241,6/6,,v29+f32|lot:shape:chainstar,"checks/data/lot_runs/inchain*.jsonl (final_mse per network; 16 files), recomputed and asserted against figures/data/shape_level_grid.csv"
+2,bar,exact,LOT's own level (fit-free),own level,0-5,0.8294,0.7897,0.8691,6/6,,v29+f32|lot:rep:chainstar,"checks/data/lot_runs/inchain*.jsonl (final_mse per network; 16 files), recomputed and asserted against figures/data/shape_level_grid.csv"
+3,diff,exact,"paired, V29 vs own level",,0-5,0.9563,0.9236,0.9890,5/6,,v29+f32|lot:shape:chainstar / v29+f32|lot:rep:chainstar,"checks/data/lot_runs/inchain*.jsonl (final_mse per network; 16 files), recomputed and asserted against figures/data/shape_level_grid.csv"
+4,reference,exact,"+ induced, V29 level",V29 level,0-11,0.7504,0.7056,0.7952,12/12,,v29+f32|lot:shape:he2,"checks/data/lot_runs/inchain*.jsonl (final_mse per network; 16 files), recomputed and asserted against figures/data/shape_level_grid.csv"
+5,group,projected,"Projected chain, K = 32",,0-11,,,,,est. ~9 u,,cost: theory notes (proj32)
+6,bar,projected,V29 level × LOT shape,V29 level,0-11,0.8217,0.7950,0.8485,12/12,,v29+f32|lot:shape:proj32:1:1:0:chain,"checks/data/lot_runs/inchain*.jsonl (final_mse per network; 16 files), recomputed and asserted against figures/data/shape_level_grid.csv"
+7,bar,projected,LOT's own level (fit-free),own level,0-11,1.3812,1.2749,1.4876,0/12,,v29+f32|lot:rep:proj32:1:1:0:chain,"checks/data/lot_runs/inchain*.jsonl (final_mse per network; 16 files), recomputed and asserted against figures/data/shape_level_grid.csv"
+8,diff,projected,"paired, V29 vs own level",,0-11,0.5949,0.5565,0.6334,12/12,,v29+f32|lot:shape:proj32:1:1:0:chain / v29+f32|lot:rep:proj32:1:1:0:chain,"checks/data/lot_runs/inchain*.jsonl (final_mse per network; 16 files), recomputed and asserted against figures/data/shape_level_grid.csv"
+9,port,projected,production port (flopscope),V29 level,0-23,0.842,0.823,0.862,24/24,,"PORTLOT port, PORTLOT_LMIN=1, PORTLOT_K=32 (project experiment files:354)","evidence ledger E01-06 (project knowledge base; value ""raw x0.842 [0.823, 0.862], 24/24; +9.2 u; +362 calls""); CI as reported there"

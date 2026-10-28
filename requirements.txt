@@ -1,0 +1,17 @@
+# Needed only to RUN the estimator (python3 verify.py --smoke) or the dump generator in training/.
+# verify.py's static checks and controls/make_controls.py use the Python standard library only.
+#
+# Versions of the official grader run of #337608 (estimator/manifest.json, grader_runtime):
+#   Python 3.10.21, numpy 2.2.6, flopscope 0.12.3 (client and server), whestbench 0.16.1.
+# The upload package itself was built locally with flopscope 0.12.1 (package manifest); the official
+# starter kit allows flopscope>=0.12.1,<0.13.0 and whestbench>=0.16.1,<0.17.0.
+flopscope==0.12.3
+whestbench==0.16.1
+numpy==2.2.6
+#
+# Head training (training/nl_train3.py, training/hx_ft.py) additionally needs PyTorch. It was run with
+# torch 2.11.0, numpy 2.4.1 and Python 3.13.11 on CPU; no specific torch feature is required.
+# torch
+#
+# Figures (figures/make_figures.py) additionally need matplotlib; the shipped figures were made with matplotlib 3.10.8.
+# matplotlib==3.10.8
